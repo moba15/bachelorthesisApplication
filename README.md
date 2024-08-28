@@ -3,7 +3,7 @@ This is a project i created for a bachelor thesis application
 
 # usage
 ## build:
-- make 
+- make all
 ## running server examaple
 ./app server 10
 ## running client example 
