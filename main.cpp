@@ -6,7 +6,7 @@
 int main(int argc, char* argv[]) {
     std::string path{argv[0]};
     if(argc < 2) {
-        std::cout << "Please use " << path <<  "server <numberOfBuckets> or " << path << " client" << std::endl;
+        std::cout << "Please use " << path <<  " server <numberOfBuckets> or " << path << " client" << std::endl;
         return -1;
     }
     std::string s{argv[1]};
