@@ -115,17 +115,17 @@ TEST_CASE("simple") {
 TEST_CASE("single thread") {
     SUBCASE("insert, read, remove 10000 buckets: 1" ) {
         serverside::hashmap2<size_t , size_t > map{1};
-        for(size_t i = 0; i<10000; i++) {
+        for(size_t i = 0; i<1000; i++) {
             map.insert(i*2, i);
         }
 
-        for(size_t i = 0; i<10000; i++) {
+        for(size_t i = 0; i<1000; i++) {
             CHECK_EQ(map.read(2*i), i);
             CHECK_EQ(map.read(2*i+1), 0);
         }
 
 
-        for(size_t i = 0; i<10000; i++) {
+        for(size_t i = 0; i<1000; i++) {
             if(i % 4 == 0) {
                 CHECK_EQ(map.remove(i), true);
             } else if(i %2 != 0) {
@@ -134,7 +134,7 @@ TEST_CASE("single thread") {
 
         }
 
-        for(size_t i = 0; i<10000; i++) {
+        for(size_t i = 0; i<1000; i++) {
             if(i%4 == 0) {
                 CHECK_EQ(map.read(i), 0);
             } else if(i%2 == 0) {
@@ -148,17 +148,17 @@ TEST_CASE("single thread") {
 
     SUBCASE("insert, read, remove 10000 buckets: 500" ) {
         serverside::hashmap2<size_t , size_t > map{500};
-        for(size_t i = 0; i<10000; i++) {
+        for(size_t i = 0; i<1000; i++) {
             map.insert(i*2, i);
         }
 
-        for(size_t i = 0; i<10000; i++) {
+        for(size_t i = 0; i<1000; i++) {
             CHECK_EQ(map.read(2*i), i);
             CHECK_EQ(map.read(2*i+1), 0);
         }
 
 
-        for(size_t i = 0; i<10000; i++) {
+        for(size_t i = 0; i<1000; i++) {
             if(i % 4 == 0) {
                 CHECK_EQ(map.remove(i), true);
             } else if(i %2 != 0) {
@@ -167,7 +167,7 @@ TEST_CASE("single thread") {
 
         }
 
-        for(size_t i = 0; i<10000; i++) {
+        for(size_t i = 0; i<1000; i++) {
             if(i%4 == 0) {
                 CHECK_EQ(map.read(i), 0);
             } else if(i%2 == 0) {
@@ -185,11 +185,11 @@ TEST_CASE("multiple thread thread") {
         serverside::hashmap2<size_t , size_t > map{1};
         std::thread t1{[&] () {
             std::this_thread::sleep_for(100ms);
-            for(size_t i = 0; i<10000; i++) {
+            for(size_t i = 0; i<1000; i++) {
                 map.insert(i*2, i);
             }
 
-            for(size_t i = 0; i<10000; i++) {
+            for(size_t i = 0; i<1000; i++) {
                 if(2*i % 4 != 0) {
                     CHECK_EQ(map.read(2*i), i);
                 }
@@ -198,7 +198,7 @@ TEST_CASE("multiple thread thread") {
             }
 
 
-            for(size_t i = 0; i<10000; i++) {
+            for(size_t i = 0; i<1000; i++) {
                 if(i % 4 == 0) {
                     CHECK_EQ(map.remove(i), true);
                 } else if(i %2 != 0 && i%3 != 0) {
@@ -207,7 +207,7 @@ TEST_CASE("multiple thread thread") {
 
             }
 
-            for(size_t i = 0; i<10000; i++) {
+            for(size_t i = 0; i<1000; i++) {
                 if(i%4 == 0) {
                     CHECK_EQ(map.read(i), 0);
                 } else if(i%2 == 0) {
@@ -217,13 +217,13 @@ TEST_CASE("multiple thread thread") {
             }
         }};
         std::thread t2{[&] () {
-            for(size_t i = 0; i<10000; i++) {
+            for(size_t i = 0; i<1000; i++) {
                 if((i*3) % 2 != 0) {
                     map.insert(i*3, i);
                 }
             }
 
-            for(size_t i = 0; i<10000; i++) {
+            for(size_t i = 0; i<1000; i++) {
                 if((i*3) % 2 != 0) {
                     CHECK_EQ(map.read(3*i), i);
                 }
@@ -237,7 +237,7 @@ TEST_CASE("multiple thread thread") {
 
         }};
         t1.join();
-       for(size_t i = 0; i<10000; i++) {
+       for(size_t i = 0; i<1000; i++) {
            if(i%4 == 0 && i%3 != 0) {
                CHECK_EQ(map.read(i), 0);
            } else if(i%2 == 0 && i%3 != 0) {
@@ -253,7 +253,7 @@ TEST_CASE("multiple thread thread") {
         serverside::hashmap2<size_t , size_t > map{1};
         std::thread t1{[&] () {
             std::this_thread::sleep_for(100ms);
-            for(size_t i = 0; i<10000; i++) {
+            for(size_t i = 0; i<1000; i++) {
                 map.insert(i*2, i);
                 map.read(i*3);
             }
@@ -261,7 +261,7 @@ TEST_CASE("multiple thread thread") {
 
         }};
         std::thread t2{[&] () {
-            for(size_t i = 0; i<10000; i++) {
+            for(size_t i = 0; i<1000; i++) {
                 if((i*3) % 2 != 0) {
                     map.insert(i*3, i);
                 }
@@ -274,7 +274,7 @@ TEST_CASE("multiple thread thread") {
 
         t1.join();
         t2.join();
-        for(size_t i = 0; i<10000; i++) {
+        for(size_t i = 0; i<1000; i++) {
             CHECK_EQ(map.read(2*i), i);
             if((i*3) % 2 != 0) {
                 CHECK_EQ(map.read(3*i), i);

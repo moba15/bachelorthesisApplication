@@ -12,6 +12,7 @@
 #include <semaphore.h>
 #include <sys/mman.h>
 #include <thread>
+#define exclusive true
 void printHelpPage() {
     std::cout << "-----Help------" << std::endl;
     std::cout << "stop -> stops the server" << std::endl;
@@ -21,6 +22,7 @@ serverside::server::server(size_t n) : sizeOfHashMap{n}, map(n) {}
 using namespace std::chrono_literals;
 void serverside::server::start() {
     std::cout << "Starting server: Buckets:" << sizeOfHashMap << std::endl;
+    std::cout << "Please stop the server by typing stop in order to avoid errors" << std::endl;
     char n = -1;
     std::cout << "Type help to see the help page" << std::endl;
 
@@ -54,28 +56,32 @@ void serverside::server::readingInputFromClients() {
 
     mutex_sem = sem_open(SEM_MUTEX_NAME,  O_CREAT, 0660, 0);
     if(mutex_sem == SEM_FAILED) {
-        //TODO Use exceptions
+        std::cout << "There went something wrong with creating/mapping to the shm" << std::endl;
         std::exit(1);
     }
     count_sem = sem_open(SEM_COUNT_NAME,  O_CREAT, 0660, 0);
     if(count_sem == SEM_FAILED) {
-        //TODO Use exceptions
+        std::cout << "There went something wrong with creating/mapping to the shm" << std::endl;
         std::exit(1);
     }
+    if(exclusive) {
+        fd_shm = shm_open(SHARED_MEMORY_NAME, O_RDWR | O_CREAT | O_EXCL , 0660 );
+    } else {
+        fd_shm = shm_open(SHARED_MEMORY_NAME, O_RDWR | O_CREAT  , 0660 );
+    }
 
-    fd_shm = shm_open(SHARED_MEMORY_NAME, O_RDWR | O_CREAT  | O_EXCL, 0660 );
     if(fd_shm == -1) {
-        //TODO Use exceptions
+        std::cout << "There went something wrong with creating/mapping to the shm" << std::endl;
         std::exit(1);
     }
     if(ftruncate(fd_shm, sizeof(struct shared::shared_memory)) ==  -1) {
-        //TODO
+        std::cout << "There went something wrong with creating/mapping to the shm" << std::endl;
         std::exit(-1);
     }
     sharedMemory = static_cast<shared::shared_memory *>(mmap(NULL, sizeof(struct shared::shared_memory), PROT_READ | PROT_WRITE,
                                                      MAP_SHARED, fd_shm, 0));
     if(sharedMemory == MAP_FAILED) {
-        //TODO
+        std::cout << "There went something wrong with creating/mapping to the shm" << std::endl;
         std::exit(-1);
     }
     sharedMemory->current_command_index = 0;

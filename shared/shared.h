@@ -7,7 +7,7 @@
 #define SEM_COUNT_NAME "/sem-count-bachelor"
 #define SHARED_MEMORY_NAME "/shm-bachelor"
 #define MAX_BUFFER_SIZE 1024
-#define MAX_KEY_STRING_SIZE 512
+#define MAX_KEY_STRING_SIZE 64
 namespace shared {
     struct command {
         unsigned char cmd;

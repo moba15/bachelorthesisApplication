@@ -34,28 +34,28 @@ void clientside::client::start() {
 
     mutex_sem = sem_open(SEM_MUTEX_NAME,0, 0, 0);
     if(mutex_sem == SEM_FAILED) {
-        //TODO Use exceptions
+        std::cout << "There went something wrong with creating/mapping to the shm. Did you start the server?" << std::endl;
         std::exit(1);
     }
     count_sem = sem_open(SEM_COUNT_NAME,  0,0,0);
     if(count_sem == SEM_FAILED) {
-        //TODO Use exceptions
+        std::cout << "There went something wrong with creating/mapping to the shm. Did you start the server?" << std::endl;
         std::exit(1);
     }
 
     fd_shm = shm_open(SHARED_MEMORY_NAME, O_RDWR , 0660 );
     if(fd_shm == -1) {
-        //TODO Use exceptions
+        std::cout << "There went something wrong with creating/mapping to the shm. Did you start the server?" << std::endl;
         std::exit(1);
     }
     if(ftruncate(fd_shm, sizeof(struct shared::shared_memory)) ==  -1) {
-        //TODO
+        std::cout << "There went something wrong with creating/mapping to the shm. Did you start the server?" << std::endl;
         std::exit(-1);
     }
     sharedMemory = static_cast<shared::shared_memory *>(mmap(NULL, sizeof(struct shared::shared_memory), PROT_READ | PROT_WRITE,
                                                              MAP_SHARED, fd_shm, 0));
     if(sharedMemory == MAP_FAILED) {
-        //TODO
+        std::cout << "There went something wrong with creating/mapping to the shm. Did you start the server?" << std::endl;
         std::exit(-1);
     }
     std::cout << "Type help to see the help page" << std::endl;
@@ -83,6 +83,10 @@ void clientside::client::parse_command(std::string command) {
             return  c + c1 + " ";
         });*/
         std::string toRemove = split[1];
+        if(toRemove.length() > 62) {
+            std::cout << "The key or value is too long. Shorter than 63" << std::endl;
+            return;
+        }
         //toRemove.erase(toRemove.end()-1, toRemove.end());
         std::cout << "Send: remove with key: " + toRemove << std::endl;
         if(sem_wait(mutex_sem) == -1) {
@@ -110,6 +114,10 @@ void clientside::client::parse_command(std::string command) {
     } else if(split.size() == 3 && split[0] == "insert") {
         std::string key = split[1];
         std::string value = split[2];
+        if(key.length() > 62 || value.length() > 62) {
+            std::cout << "The key or value is too long. Shorter than 63" << std::endl;
+            return;
+        }
 
         std::cout << "Send: inserting (key,value): (" << key << "," << value << ")"  << std::endl;
         shared::command c{};
@@ -125,6 +133,11 @@ void clientside::client::parse_command(std::string command) {
     } else if(split.size() == 2 && split[0] == "read") {
         std::string key = split[1];
 
+
+        if(key.length() > 62) {
+            std::cout << "The key or value is too long. Shorter than 63" << std::endl;
+            return;
+        }
 
         std::cout << "Send: read key: " << key << std::endl;
         shared::command c{};

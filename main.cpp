@@ -16,12 +16,12 @@ int main(int argc, char* argv[]) {
         c.start();
     } else if(s == "server" ) {
         if(argc < 3) {
-            std::cout << "Please provide a number of buckets" << std::endl;
+            std::cout << "Please provide a number of buckets: " << path << " server <numberOfBuckets>" << std::endl;
             return 1;
         }
 
         unsigned long n = std::strtol(argv[2], nullptr, 10);
-        if(n <= 0) {
+        if(n <= 0 || n==LONG_MAX || n==LONG_MIN) {
             std::cout << "Please use a valid number" << std::endl;
             return -1;
         }
